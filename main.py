@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov  7 12:03:52 2018
+
+@author: yzzhao2
+"""
+
+import argparse
+import os
+
+import trainer
+
+if __name__ == "__main__":
+    # ----------------------------------------
+    #        Initialize the parameters
+    # ----------------------------------------
+    # Training setting refers to VGG-Net paper in ICLR 2015
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--epochs', type = int, default = 40, help = 'number of epochs of training')
+    parser.add_argument('--batch_size', type = int, default = 16, help = 'size of the batches')
+    parser.add_argument('--baseroot', type = str, default = "/media/ztt/6864FEA364FE72E4/zhaoyuzhi/KAIST_spectral_zip/",
+        help = 'the training folder, while adding "\\" at the end of this string')
+    parser.add_argument('--lr', type = float, default = 0.0002, help='Adam: learning rate')
+    parser.add_argument('--b1', type=float, default = 0.5, help='Adam: beta1')
+    parser.add_argument('--b2', type = float, default = 0.999, help = 'Adam: beta2')
+    parser.add_argument('--lr_decrease_epoch', type = int, default = 10, help = 'lr decrease at certain epoch and its multiple')
+    parser.add_argument('--lr_decrease_factor', type = float, default = 0.5, help = 'lr decrease factor, for classification default 0.1')
+    parser.add_argument('--num_workers', type = int, default = 8, help = 'number of cpu threads to use during batch generation')
+    parser.add_argument('--img_height', type = int, default = 256, help = 'size of image height')
+    parser.add_argument('--img_width', type = int, default = 256, help = 'size of image width')
+    parser.add_argument('--checkpoint_interval', type = int, default = 5, help = 'interval between model checkpoints')
+    parser.add_argument('--pre_train', type = bool, default = True, help = 'pre-trained model exists ot not')
+    parser.add_argument('--modelname', type = str, default = "Pre_Infrared_epoch20_batchsize16", help = 'modelname: load the model by name')
+    parser.add_argument('--load_epoch', type = int, default = 0, help = 'the specific epoch corresponding to model name')
+    parser.add_argument('--multi_gpu', type = bool, default = False, help = 'nn.Parallel needs or not')
+    parser.add_argument('--gpu_ids', type = str, default = "0, 1", help = 'gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+    parser.add_argument('--cudnn_benchmark', type = bool, default = True, help = 'if input data structure is unchanged, set it as True')
+    opt = parser.parse_args()
+    print(opt)
+    # ----------------------------------------
+    #       Choose CUDA visible devices
+    # ----------------------------------------
+    if opt.multi_gpu == True:
+        os.environ["CUDA_VISIBLE_DEVICES"] = opt.gpu_ids
+    else:
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    
+    # Enter main function
+    trainer.Trainer(opt)
